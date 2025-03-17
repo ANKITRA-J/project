@@ -1,7 +1,7 @@
 # Swift IDE
 
 A modern web-based IDE for Swift development with SwiftUI preview support.
-
+[![Netlify Status](https://api.netlify.com/api/v1/badges/4d3d4586-0378-4a9d-a421-53cb1f8737ff/deploy-status)](https://app.netlify.com/sites/tinycode/deploys)
 ## Features
 
 - Monaco Editor with Swift syntax highlighting
