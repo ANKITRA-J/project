@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import * as monaco from 'monaco-editor';
 import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';
 
@@ -12,38 +11,50 @@ interface EditorProps {
 
 export function Editor({ code, onChange }: EditorProps) {
   const editorRef = useRef<HTMLDivElement>(null);
-  const editorInstance = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
+  const monacoRef = useRef<any>(null);
 
   useEffect(() => {
-    if (!editorRef.current) return;
+    if (typeof window === 'undefined') return;
 
-    // Initialize Monaco Editor
-    editorInstance.current = monaco.editor.create(editorRef.current, {
-      value: code,
-      language: 'swift',
-      theme: 'vs-dark',
-      minimap: { enabled: false },
-      fontSize: 14,
-      lineNumbers: 'on',
-      scrollBeyondLastLine: false,
-      automaticLayout: true,
-    });
+    // Dynamically import Monaco Editor only on the client side
+    import('monaco-editor').then(monaco => {
+      if (!editorRef.current) return;
+      
+      // Cleanup previous instance
+      if (monacoRef.current) {
+        monacoRef.current.dispose();
+      }
 
-    // Handle code changes
-    editorInstance.current.onDidChangeModelContent(() => {
-      const value = editorInstance.current?.getValue() || '';
-      onChange(value);
+      // Initialize Monaco Editor
+      monacoRef.current = monaco.editor.create(editorRef.current, {
+        value: code,
+        language: 'swift',
+        theme: 'vs-dark',
+        minimap: { enabled: false },
+        fontSize: 14,
+        lineNumbers: 'on',
+        scrollBeyondLastLine: false,
+        automaticLayout: true,
+      });
+
+      // Handle code changes
+      monacoRef.current.onDidChangeModelContent(() => {
+        const value = monacoRef.current?.getValue() || '';
+        onChange(value);
+      });
     });
 
     return () => {
-      editorInstance.current?.dispose();
+      if (monacoRef.current) {
+        monacoRef.current.dispose();
+      }
     };
   }, []);
 
   // Update editor content when code prop changes
   useEffect(() => {
-    if (editorInstance.current && code !== editorInstance.current.getValue()) {
-      editorInstance.current.setValue(code);
+    if (monacoRef.current && code !== monacoRef.current.getValue()) {
+      monacoRef.current.setValue(code);
     }
   }, [code]);
 

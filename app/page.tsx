@@ -13,8 +13,9 @@ import { Moon, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 // Dynamically import the Editor component with SSR disabled
-const Editor = dynamic(() => import('@/components/editor/Editor').then(mod => ({ default: mod.Editor })), {
+const Editor = dynamic(() => import('@/components/editor/Editor').then(mod => mod.Editor), {
   ssr: false,
+  loading: () => <div className="h-full flex items-center justify-center">Loading editor...</div>
 });
 
 function ThemeToggle() {
