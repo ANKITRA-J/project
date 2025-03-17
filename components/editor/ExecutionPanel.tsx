@@ -13,7 +13,7 @@ export function ExecutionPanel() {
         </Button>
       </div>
       <div className="h-[calc(100%-2.5rem)] overflow-auto p-4 font-mono text-sm">
-        <div className="text-muted-foreground">// Output will appear here</div>
+        <div className="text-muted-foreground">{/* Output will appear here */}</div>
       </div>
     </div>
   );

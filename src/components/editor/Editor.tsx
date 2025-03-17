@@ -16,17 +16,21 @@ export function Editor({ code, onChange }: EditorProps) {
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    // Dynamically import Monaco Editor only on the client side
-    import('monaco-editor').then(monaco => {
+    let monaco: any;
+    
+    // Dynamically import Monaco Editor only on client side
+    import('monaco-editor').then(module => {
+      monaco = module;
+      
       if (!editorRef.current) return;
       
-      // Cleanup previous instance
+      // Clean up previous instance if it exists
       if (monacoRef.current) {
         monacoRef.current.dispose();
       }
 
-      // Initialize Monaco Editor
-      monacoRef.current = monaco.editor.create(editorRef.current, {
+      // Initialize editor
+      const editor = monaco.editor.create(editorRef.current, {
         value: code,
         language: 'swift',
         theme: 'vs-dark',
@@ -37,21 +41,25 @@ export function Editor({ code, onChange }: EditorProps) {
         automaticLayout: true,
       });
 
-      // Handle code changes
-      monacoRef.current.onDidChangeModelContent(() => {
-        const value = monacoRef.current?.getValue() || '';
+      // Save reference
+      monacoRef.current = editor;
+
+      // Handle content changes
+      editor.onDidChangeModelContent(() => {
+        const value = editor.getValue();
         onChange(value);
       });
     });
 
     return () => {
+      // Clean up
       if (monacoRef.current) {
         monacoRef.current.dispose();
       }
     };
   }, []);
 
-  // Update editor content when code prop changes
+  // Update editor when code prop changes
   useEffect(() => {
     if (monacoRef.current && code !== monacoRef.current.getValue()) {
       monacoRef.current.setValue(code);
